@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HVAC Quote and Invoice Generator</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    .invoice-box,
+    .terms-page {
+      background: white;
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.12);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin: 4px 0 12px;
+      box-sizing: border-box;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    th {
+      background: #222;
+      color: white;
+    }
+
+    button {
+      padding: 10px 14px;
+      margin-top: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: white;
+    }
+
+    button.remove {
+      background: #a11;
+    }
+
+    .totals {
+      max-width: 350px;
+      margin-left: auto;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .totals div {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .grand-total {
+      font-weight: bold;
+      font-size: 22px;
+      border-top: 2px solid #000;
+      margin-top: 8px;
+      padding-top: 10px;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .terms-page {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 30px;
+    }
+
+    @media print {
+      button {
+        display: none;
+      }
+
+      body {
+        background: white;
+      }
+
+      .invoice-box,
+      .terms-page {
+        box-shadow: none;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="invoice-box">
+  <h1>HVAC Service Quote / Invoice</h1>
+
+  <h2 id="quoteStatus">QUOTE / ESTIMATE</h2>
+  <p>Accepted Date: <span id="acceptedDate">Not yet accepted</span></p>
+
+  <div class="grid">
+    <div>
+      <h2>Company Info</h2>
+      <input id="companyName" placeholder="Company Name">
+      <input id="companyPhone" placeholder="Phone">
+      <input id="companyEmail" placeholder="Email">
+      <textarea id="companyAddress" placeholder="Company Address"></textarea>
+    </div>
+
+    <div>
+      <h2>Customer Info</h2>
+      <input id="customerName" placeholder="Customer Name">
+      <input id="customerPhone" placeholder="Customer Phone">
+      <input id="customerEmail" placeholder="Customer Email">
+      <textarea id="customerAddress" placeholder="Service Address"></textarea>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <label>Invoice Number</label>
+      <input id="invoiceNumber" placeholder="INV-1001">
+    </div>
+
+    <div>
+      <label>Date</label>
+      <input id="invoiceDate" type="date">
+    </div>
+  </div>
+
+  <h2>Invoice Items</h2>
+
+  <table id="itemsTable">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Qty / Hours</th>
+        <th>Unit Price</th>
+        <th>Line Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody"></tbody>
+  </table>
+
+  <button onclick="addItem()">Add Item</button>
+
+  <h2>Fees &amp; Tax</h2>
+
+  <div class="grid">
+    <div>
+      <label>Other Fees</label>
+      <input id="otherFees" type="number" step="0.01" value="0" oninput="calculateTotals()">
+    </div>
+
+    <div>
+      <label>Tax Rate %</label>
+      <input id="taxRate" type="number" step="0.01" value="5" oninput="calculateTotals()">
+    </div>
+  </div>
+
+  <div class="totals">
+    <div><span>Subtotal:</span><span id="subtotal">$0.00</span></div>
+    <div><span>Other Fees:</span><span id="feesTotal">$0.00</span></div>
+    <div><span>Tax:</span><span id="taxTotal">$0.00</span></div>
+    <div class="grand-total"><span>Total:</span><span id="grandTotal">$0.00</span></div>
+  </div>
+
+  <h2>Notes</h2>
+  <textarea id="notes" placeholder="Example: Furnace diagnostic completed. Filter replaced. Customer approved repair."></textarea>
+
+  <button onclick="acceptQuote()">Agree Quote &amp; Generate PDF</button>
+</div>
+
+<div class="page-break"></div>
+
+<section class="terms-page">
+  <h1>HVAC Service Authorization Agreement</h1>
+
+  <p>
+    By accepting this quote, the customer authorizes the HVAC company to perform
+    the work described in the attached quote, invoice, or work order.
+  </p>
+
+  <h3>Diagnostic Fees</h3>
+  <p>
+    Diagnostic and service call fees are charged for technician time, travel,
+    testing, and evaluation regardless of whether repairs are approved.
+    Diagnostic fees are non-refundable.
+  </p>
+
+  <h3>Existing Equipment Condition</h3>
+  <p>
+    HVAC equipment may contain pre-existing defects, corrosion, electrical faults,
+    refrigerant leaks, water damage, improper prior repairs, or code issues not
+    visible during initial inspection.
+  </p>
+
+  <h3>Repair Limitations</h3>
+  <p>
+    Repairing one failed component does not guarantee that other components will
+    not fail in the future. Older systems may experience additional failures
+    unrelated to the repair being performed.
+  </p>
+
+  <h3>Parts &amp; Warranty</h3>
+  <p>
+    Parts may be OEM, aftermarket, equivalent, or manufacturer-approved
+    alternatives depending on availability. Manufacturer warranties follow
+    manufacturer terms.
+  </p>
+
+  <h3>Payment Terms</h3>
+  <p>
+    Payment is due upon completion unless otherwise agreed in writing.
+  </p>
+
+  <h3>Limitation of Liability</h3>
+  <p>
+    The company is not liable for indirect, incidental, future, or consequential
+    damages caused by pre-existing conditions, utility issues, manufacturer
+    defects, or lack of maintenance.
+  </p>
+
+  <br><br>
+
+  <p>Customer Name: ____________________________________</p>
+  <p>Customer Signature: _______________________________</p>
+  <p>Date: ____________________________________________</p>
+
+  <br>
+
+  <p>Technician Name: __________________________________</p>
+  <p>Technician Signature: _____________________________</p>
+  <p>Date: ____________________________________________</p>
+</section>
+
+<script>
+  function money(value) {
+    return "$" + Number(value || 0).toFixed(2);
+  }
+
+  function formatDateISO(date) {
+    return date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0") + "-" +
+      String(date.getDate()).padStart(2, "0");
+  }
+
+  function addItem(type = "Labour", description = "", qty = 1, price = 0) {
+    const itemsBody = document.getElementById("itemsBody");
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>
+        <select onchange="calculateTotals()">
+          <option ${type === "Labour" ? "selected" : ""}>Labour</option>
+          <option ${type === "Parts" ? "selected" : ""}>Parts</option>
+          <option ${type === "Service Fee" ? "selected" : ""}>Service Fee</option>
+          <option ${type === "Other" ? "selected" : ""}>Other</option>
+        </select>
+      </td>
+      <td><input value="${description}" placeholder="Description"></td>
+      <td><input type="number" step="0.01" value="${qty}" oninput="calculateTotals()"></td>
+      <td><input type="number" step="0.01" value="${price}" oninput="calculateTotals()"></td>
+      <td class="lineTotal">$0.00</td>
+      <td><button class="remove" onclick="removeItem(this)">X</button></td>
+    `;
+
+    itemsBody.appendChild(row);
+    calculateTotals();
+  }
+
+  function removeItem(button) {
+    button.closest("tr").remove();
+    calculateTotals();
+  }
+
+  function calculateTotals() {
+    let subtotal = 0;
+    const itemsBody = document.getElementById("itemsBody");
+
+    [...itemsBody.querySelectorAll("tr")].forEach(row => {
+      const qty = parseFloat(row.children[2].querySelector("input").value) || 0;
+      const price = parseFloat(row.children[3].querySelector("input").value) || 0;
+      const lineTotal = qty * price;
+
+      row.querySelector(".lineTotal").textContent = money(lineTotal);
+      subtotal += lineTotal;
+    });
+
+    const otherFees = parseFloat(document.getElementById("otherFees").value) || 0;
+    const taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
+
+    const taxableAmount = subtotal + otherFees;
+    const tax = taxableAmount * (taxRate / 100);
+    const grandTotal = taxableAmount + tax;
+
+    document.getElementById("subtotal").textContent = money(subtotal);
+    document.getElementById("feesTotal").textContent = money(otherFees);
+    document.getElementById("taxTotal").textContent = money(tax);
+    document.getElementById("grandTotal").textContent = money(grandTotal);
+  }
+
+  function acceptQuote() {
+    const agreed = confirm(
+      "By clicking OK, the customer agrees to the quote and the attached HVAC Service Authorization Terms."
+    );
+
+    if (!agreed) return;
+
+    document.getElementById("quoteStatus").textContent = "QUOTE ACCEPTED";
+    document.getElementById("acceptedDate").textContent = formatDateISO(new Date());
+
+    window.print();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("invoiceDate").value = formatDateISO(new Date());
+
+    addItem("Labour", "HVAC labour", 1, 95);
+    addItem("Service Fee", "Diagnostic / service call fee", 1, 120);
+    addItem("Parts", "Replacement part", 1, 0);
+  });
+</script>
+
+</body>
+</html>
