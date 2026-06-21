@@ -270,6 +270,12 @@
     return "$" + Number(value || 0).toFixed(2);
   }
 
+  function formatDateISO(date) {
+    return date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0") + "-" +
+      String(date.getDate()).padStart(2, "0");
+  }
+
   function addItem(type = "Labour", description = "", qty = 1, price = 0) {
     const itemsBody = document.getElementById("itemsBody");
     const row = document.createElement("tr");
@@ -333,17 +339,13 @@
     if (!agreed) return;
 
     document.getElementById("quoteStatus").textContent = "QUOTE ACCEPTED";
-    document.getElementById("acceptedDate").textContent = new Date().toISOString().split("T")[0];
+    document.getElementById("acceptedDate").textContent = formatDateISO(new Date());
 
     window.print();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const today = new Date();
-    document.getElementById("invoiceDate").value =
-      today.getFullYear() + "-" +
-      String(today.getMonth() + 1).padStart(2, "0") + "-" +
-      String(today.getDate()).padStart(2, "0");
+    document.getElementById("invoiceDate").value = formatDateISO(new Date());
 
     addItem("Labour", "HVAC labour", 1, 95);
     addItem("Service Fee", "Diagnostic / service call fee", 1, 120);
