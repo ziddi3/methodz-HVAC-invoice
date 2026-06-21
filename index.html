@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Method HVAC Invoice Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Arial, Helvetica, sans-serif; background:#f3f4f6; color:#151515; padding:20px; }
+    .page { max-width:1000px; margin:0 auto 24px; background:#fff; padding:28px; border-radius:10px; box-shadow:0 0 12px rgba(0,0,0,.1); }
+    .page-break { page-break-before:always; }
+    .topbar { display:flex; justify-content:space-between; gap:20px; border-bottom:2px solid #111; padding-bottom:14px; margin-bottom:18px; }
+    .company-lines { margin:4px 0; color:#555; font-size:14px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+    .section { border:1px solid #d7d7d7; padding:16px; border-radius:8px; margin-bottom:18px; }
+    label { display:block; font-weight:bold; font-size:13px; margin-bottom:4px; }
+    input, textarea, select { width:100%; padding:9px; border:1px solid #d7d7d7; border-radius:5px; margin-bottom:12px; font:inherit; }
+    textarea { min-height:80px; resize:vertical; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th, td { border:1px solid #d7d7d7; padding:8px; vertical-align:top; }
+    th { background:#111827; color:#fff; font-size:13px; }
+    td input, td select { margin-bottom:0; }
+    button { border:0; border-radius:6px; padding:10px 14px; background:#111827; color:#fff; cursor:pointer; font-weight:bold; margin:6px 6px 6px 0; }
+    button.secondary { background:#4b5563; }
+    button.remove { background:#9b111e; }
+    .totals { max-width:390px; margin-left:auto; font-size:16px; }
+    .totals div { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #d7d7d7; }
+    .grand-total { font-weight:bold; font-size:22px; border-top:2px solid #111; border-bottom:0!important; margin-top:6px; padding-top:12px!important; }
+    .signature-box { border:1px solid #d7d7d7; padding:16px; border-radius:8px; margin-top:20px; break-inside:avoid; }
+    .signature-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:18px; }
+    .signature-line { border-bottom:1px solid #111; height:34px; margin-bottom:6px; }
+    .initials-row { display:grid; grid-template-columns:1fr 130px; gap:14px; align-items:end; border-bottom:1px solid #d7d7d7; padding:10px 0; break-inside:avoid; }
+    .initials-box { border-bottom:1px solid #111; height:28px; text-align:center; font-size:12px; color:#666; }
+    .checkbox-line { display:flex; gap:8px; align-items:center; margin:8px 0; }
+    .checkbox-line input { width:auto; margin:0; }
+    .note { color:#555; font-size:12px; }
+    @media(max-width:760px){ body{padding:10px}.page{padding:16px}.topbar,.grid-2,.grid-3,.signature-grid,.initials-row{display:grid;grid-template-columns:1fr} }
+    @media print { body{background:#fff;padding:0} button{display:none!important} .page{box-shadow:none;border-radius:0;margin:0;max-width:none;min-height:10.5in;page-break-after:always} .page:last-child{page-break-after:auto} input,textarea,select{border:0;border-bottom:1px solid #aaa;border-radius:0} }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div>
+        <h1>Method HVAC</h1>
+        <p class="company-lines">Phone: +1 368 337 4085</p>
+        <p class="company-lines">Email: charles@method-hvac.com | Franco@method-hvac.com</p>
+      </div>
+      <div>
+        <h2 id="quoteStatus">QUOTE / ESTIMATE</h2>
+        <strong>Accepted Date: <span id="acceptedDate">Not yet accepted</span></strong>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <section class="section">
+        <h2>Company Info</h2>
+        <label>Company Name</label><input id="companyName" value="Method HVAC" />
+        <label>Phone</label><input id="companyPhone" value="+1 368 337 4085" />
+        <label>Email</label><input id="companyEmail" value="charles@method-hvac.com; Franco@method-hvac.com" />
+        <label>Address</label><textarea id="companyAddress" placeholder="Company address"></textarea>
+      </section>
+      <section class="section">
+        <h2>Customer Info</h2>
+        <label>Customer Name</label><input id="customerName" placeholder="Customer name" />
+        <label>Customer Phone</label><input id="customerPhone" placeholder="Customer phone" />
+        <label>Customer Email</label><input id="customerEmail" placeholder="Customer email" />
+        <label>Service Address</label><textarea id="customerAddress" placeholder="Service address"></textarea>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Invoice Details</h2>
+      <div class="grid-3">
+        <div><label>Invoice / Quote Number</label><input id="invoiceNumber" placeholder="INV-1001" /></div>
+        <div><label>Date</label><input id="invoiceDate" type="date" /></div>
+        <div><label>Due Date</label><input id="dueDate" type="date" /></div>
+      </div>
+      <div class="grid-3">
+        <div><label>Job Type</label><select id="jobType"><option>Service Call</option><option>Diagnostic</option><option>Repair</option><option>Maintenance</option><option>Installation</option><option>Emergency Service</option></select></div>
+        <div><label>Technician</label><input id="technicianName" placeholder="Technician name" /></div>
+        <div><label>Payment Terms</label><select id="paymentTerms"><option>Due upon completion</option><option>Due upon acceptance</option><option>Net 7</option><option>Net 15</option><option>Net 30</option></select></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Equipment / Job Notes</h2>
+      <div class="grid-3">
+        <div><label>Equipment Type</label><input id="equipmentType" placeholder="Furnace, AC, RTU, humidifier" /></div>
+        <div><label>Model</label><input id="equipmentModel" placeholder="Model number" /></div>
+        <div><label>Serial</label><input id="equipmentSerial" placeholder="Serial number" /></div>
+      </div>
+      <label>Scope / Notes</label><textarea id="workDescription" placeholder="Diagnostic findings, quoted work, safety concerns, and recommendations."></textarea>
+    </section>
+
+    <section class="section">
+      <h2>Labour, Parts, Fees, and Taxes</h2>
+      <table><thead><tr><th>Type</th><th>Description</th><th>Qty / Hours</th><th>Unit Price</th><th>Taxable</th><th>Line Total</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table>
+      <button type="button" onclick="addItem()">Add Item</button>
+      <button type="button" class="secondary" onclick="addPresetMaintenance()">Add Maintenance Preset</button>
+      <button type="button" class="secondary" onclick="addPresetRepair()">Add Repair Preset</button>
+      <div class="grid-3" style="margin-top:18px">
+        <div><label>Other Fees</label><input id="otherFees" type="number" step="0.01" value="0" oninput="calculateTotals()" /></div>
+        <div><label>Tax Rate %</label><input id="taxRate" type="number" step="0.01" value="5" oninput="calculateTotals()" /></div>
+        <div><label>Deposit / Payment Received</label><input id="depositPaid" type="number" step="0.01" value="0" oninput="calculateTotals()" /></div>
+      </div>
+      <div class="totals">
+        <div><span>Subtotal:</span><span id="subtotal">$0.00</span></div>
+        <div><span>Other Fees:</span><span id="feesTotal">$0.00</span></div>
+        <div><span>Taxable Amount:</span><span id="taxableAmount">$0.00</span></div>
+        <div><span>Tax:</span><span id="taxTotal">$0.00</span></div>
+        <div><span>Deposit / Paid:</span><span id="depositTotal">$0.00</span></div>
+        <div class="grand-total"><span>Balance Due:</span><span id="grandTotal">$0.00</span></div>
+      </div>
+    </section>
+
+    <section class="signature-box">
+      <h2>Customer Quote Approval / Invoice Acknowledgement</h2>
+      <p>I reviewed the quoted work, listed prices, taxes, fees, and attached service terms. I authorize Method HVAC to proceed with the approved work unless this document is marked as an estimate only.</p>
+      <div class="signature-grid"><div><div class="signature-line"></div><strong>Customer Signature</strong></div><div><div class="signature-line"></div><strong>Date</strong></div></div>
+    </section>
+    <p class="note">Template notice: Have this form reviewed by a qualified local professional before relying on it as a legal contract.</p>
+    <button type="button" onclick="acceptQuote()">Agree Quote & Generate PDF</button>
+    <button type="button" class="secondary" onclick="window.print()">Print / Save PDF Without Acceptance</button>
+  </main>
+
+  <section class="page page-break">
+    <h1>Method HVAC Service Authorization</h1>
+    <p>This page is attached to the quote, invoice, estimate, or work order. Customer should sign this page separately from the price page.</p>
+    <div class="initials-row"><div><h3>Authorization</h3><p>Customer authorizes Method HVAC to perform the services listed in the attached document. Additional work may require separate approval.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Diagnostic Fees</h3><p>Diagnostic and service call fees cover technician time, travel, testing, evaluation, and administrative handling.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Existing Equipment Condition</h3><p>Equipment may have wear, corrosion, electrical faults, refrigerant leaks, drainage issues, blocked airflow, previous repair issues, or hidden defects.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Repair Limits</h3><p>Repairing one component does not guarantee that other components will not fail later.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Parts and Availability</h3><p>Parts may be OEM, aftermarket, equivalent, rebuilt, or manufacturer-approved alternatives depending on availability.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Warranty</h3><p>Warranty coverage depends on written invoice terms and manufacturer policies. Warranty does not apply to unrelated failures, misuse, lack of maintenance, or conditions outside the service scope.</p></div><div class="initials-box">Customer Initials</div></div>
+    <section class="signature-box"><h2>Customer Signature</h2><p>I have read this Service Authorization page and agree it forms part of the attached invoice, quote, estimate, or work order.</p><div class="signature-grid"><div><div class="signature-line"></div><strong>Customer Signature</strong></div><div><div class="signature-line"></div><strong>Date</strong></div></div></section>
+  </section>
+
+  <section class="page page-break">
+    <h1>Payment, Completion, and Customer Decision Record</h1>
+    <p>This page records payment terms, access, documentation, completion status, and customer decisions.</p>
+    <div class="initials-row"><div><h3>Payment</h3><p>Payment is due according to the selected payment terms. If no separate written terms are provided, payment is due upon completion.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Access</h3><p>Customer authorizes access to service areas required for the work, including mechanical rooms, utility areas, rooftops, crawl spaces, attics, outdoor units, panels, valves, and shutoffs.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="initials-row"><div><h3>Photos and Records</h3><p>Technicians may document equipment, serial numbers, defects, work performed, and safety concerns for customer records, warranty, quality control, insurance, and compliance.</p></div><div class="initials-box">Customer Initials</div></div>
+    <div class="section"><h2>Customer Decision Checklist</h2><label class="checkbox-line"><input type="checkbox" /> Customer approved the quoted work.</label><label class="checkbox-line"><input type="checkbox" /> Customer declined recommended repairs.</label><label class="checkbox-line"><input type="checkbox" /> Customer declined replacement recommendation.</label><label class="checkbox-line"><input type="checkbox" /> Customer was informed of safety concerns.</label><label class="checkbox-line"><input type="checkbox" /> Customer was informed of code or compliance concerns.</label><label class="checkbox-line"><input type="checkbox" /> Customer received or was offered a copy of this invoice and terms package.</label></div>
+    <section class="signature-box"><h2>Completion / Terms Signature</h2><p>I acknowledge the payment terms, access terms, documentation terms, and customer decision checklist above.</p><div class="signature-grid"><div><div class="signature-line"></div><strong>Customer Signature</strong></div><div><div class="signature-line"></div><strong>Date</strong></div></div><div class="signature-grid"><div><div class="signature-line"></div><strong>Technician Signature</strong></div><div><div class="signature-line"></div><strong>Date</strong></div></div></section>
+  </section>
+
+  <script>
+    function money(value) { return '$' + Number(value || 0).toFixed(2); }
+    function addItem(type='Labour', description='', qty=1, price=0, taxable=true) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td><select onchange="calculateTotals()"><option ${type==='Labour'?'selected':''}>Labour</option><option ${type==='Parts'?'selected':''}>Parts</option><option ${type==='Service Fee'?'selected':''}>Service Fee</option><option ${type==='Permit / Inspection'?'selected':''}>Permit / Inspection</option><option ${type==='Other'?'selected':''}>Other</option></select></td><td><input value="${description}" placeholder="Description"></td><td><input type="number" step="0.01" value="${qty}" oninput="calculateTotals()"></td><td><input type="number" step="0.01" value="${price}" oninput="calculateTotals()"></td><td style="text-align:center"><input type="checkbox" ${taxable?'checked':''} onchange="calculateTotals()"></td><td class="lineTotal">$0.00</td><td><button class="remove" type="button" onclick="removeItem(this)">X</button></td>`;
+      document.getElementById('itemsBody').appendChild(row);
+      calculateTotals();
+    }
+    function removeItem(button) { button.closest('tr').remove(); calculateTotals(); }
+    function calculateTotals() {
+      let subtotal = 0, taxableAmount = 0;
+      document.querySelectorAll('#itemsBody tr').forEach(row => {
+        const qty = parseFloat(row.children[2].querySelector('input').value) || 0;
+        const price = parseFloat(row.children[3].querySelector('input').value) || 0;
+        const taxable = row.children[4].querySelector('input').checked;
+        const line = qty * price;
+        subtotal += line;
+        if (taxable) taxableAmount += line;
+        row.querySelector('.lineTotal').textContent = money(line);
+      });
+      const fees = parseFloat(document.getElementById('otherFees').value) || 0;
+      const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+      const deposit = parseFloat(document.getElementById('depositPaid').value) || 0;
+      const taxableBase = taxableAmount + fees;
+      const tax = taxableBase * (taxRate / 100);
+      const balance = subtotal + fees + tax - deposit;
+      document.getElementById('subtotal').textContent = money(subtotal);
+      document.getElementById('feesTotal').textContent = money(fees);
+      document.getElementById('taxableAmount').textContent = money(taxableBase);
+      document.getElementById('taxTotal').textContent = money(tax);
+      document.getElementById('depositTotal').textContent = money(deposit);
+      document.getElementById('grandTotal').textContent = money(balance);
+    }
+    function acceptQuote() {
+      if (!confirm('Customer agrees to the Method HVAC quote and attached service terms. Continue to PDF?')) return;
+      document.getElementById('quoteStatus').textContent = 'QUOTE ACCEPTED';
+      document.getElementById('acceptedDate').textContent = new Date().toLocaleDateString();
+      window.print();
+    }
+    function addPresetMaintenance() { addItem('Labour','HVAC maintenance labour',1,95,true); addItem('Service Fee','Diagnostic / service call fee',1,120,true); addItem('Parts','Filter / standard maintenance materials',1,0,true); }
+    function addPresetRepair() { addItem('Labour','HVAC repair labour',1,125,true); addItem('Parts','Replacement part',1,0,true); addItem('Service Fee','Diagnostic / service call fee',1,120,true); }
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      document.getElementById('invoiceDate').valueAsDate = today;
+      const due = new Date(today); due.setDate(today.getDate() + 7);
+      document.getElementById('dueDate').valueAsDate = due;
+      addItem('Labour','HVAC labour',1,95,true);
+      addItem('Service Fee','Diagnostic / service call fee',1,120,true);
+      addItem('Parts','Replacement part',1,0,true);
+    });
+  </script>
+</body>
+</html>
