@@ -197,7 +197,7 @@
   </div>
 
   <h2>Notes</h2>
-  <textarea placeholder="Example: Furnace diagnostic completed. Filter replaced. Customer approved repair."></textarea>
+  <textarea id="notes" placeholder="Example: Furnace diagnostic completed. Filter replaced. Customer approved repair."></textarea>
 
   <button onclick="acceptQuote()">Agree Quote &amp; Generate PDF</button>
 </div>
@@ -333,13 +333,17 @@
     if (!agreed) return;
 
     document.getElementById("quoteStatus").textContent = "QUOTE ACCEPTED";
-    document.getElementById("acceptedDate").textContent = new Date().toLocaleDateString();
+    document.getElementById("acceptedDate").textContent = new Date().toISOString().split("T")[0];
 
     window.print();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("invoiceDate").valueAsDate = new Date();
+    const today = new Date();
+    document.getElementById("invoiceDate").value =
+      today.getFullYear() + "-" +
+      String(today.getMonth() + 1).padStart(2, "0") + "-" +
+      String(today.getDate()).padStart(2, "0");
 
     addItem("Labour", "HVAC labour", 1, 95);
     addItem("Service Fee", "Diagnostic / service call fee", 1, 120);
